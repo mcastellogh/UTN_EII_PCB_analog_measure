@@ -59,6 +59,7 @@ Average<float>* array_proc[numberOfVars];
 
 
 void measure_init(void){
+    analogSetAttenuation(ADC_11db);
     //uint16_t samples=config.t_reg/config.t_sample; //for future features
     uint16_t samples=MAX_mSEC_AVE_AN/MAX_mSEC_SAMPLE_AN; //Calculate number of samples based on register time (average time) and sample time
     msec_an_reg=millis();
@@ -143,7 +144,7 @@ float _measure_unit_calc(uint8_t var_idx, uint16_t unit){
     float value=0;
     switch (unit){
         case TC1047:
-            value=((((float)data[var_idx].raw_value /1024)-.5)/.01)*tc1047gain+tc1047offset; 
+            value=((((float)data[var_idx].raw_value /4095)-.5)/.01)*tc1047gain+tc1047offset; 
             break;
         case LM35:
             value=((float)data[var_idx].raw_value)*lm35gain+lm35offset; 
@@ -152,7 +153,9 @@ float _measure_unit_calc(uint8_t var_idx, uint16_t unit){
             value=data[var_idx].raw_value;
             break;
         case mV:
-            value=((((float)data[var_idx].raw_value/1024*3.3)));
+            value=(((((float)data[var_idx].raw_value/4095)*3.3)));
+            Serial.print("[DEBUG] mV: ");
+            Serial.println(value);
             break;
     }
     return value;
